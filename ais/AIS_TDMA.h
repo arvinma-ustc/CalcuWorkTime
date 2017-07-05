@@ -39,6 +39,8 @@ struct Slot_TDMA_Cand
 	unsigned short chanel:1;
 };
 
+int Ra_TDMA(struct AIS_TDMA *LME);
+
 void Ra_TDMA_main();
 unsigned char Get_Slot_RATDMA(unsigned int start_slot,unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
 
