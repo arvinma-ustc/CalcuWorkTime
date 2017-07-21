@@ -33,6 +33,57 @@ struct AIS_TDMA
 	unsigned char ITKP:1;	//保持标志
 };
 
+struct AIS_ITDMA
+{
+	unsigned short ITING;	//时隙增量0-8191，ITMDA
+	unsigned char ITKP:1;	//保持标志
+	unsigned char CHANNEL_NEXT:1;	//保持标志
+	unsigned char ITSL:3;	//时隙数1-5
+};
+
+struct AIS_SOTDMA
+{
+	unsigned short 	NSS;	//标称开始时隙0-2249
+	unsigned short 	NS;	//标称时隙0-2249
+	unsigned short 	NTS;	//标称传输时隙0-2249
+	unsigned char  Rr:5;	//报告频次2-30
+	unsigned char  TIME_OUT:3;	//时隙超时
+};
+
+
+struct CHAR256 
+{
+	char data[32];
+};
+
+struct A_BSO_B_MESSAGE 
+{
+	char slop;
+	char train[3];
+	char startflag;
+	char data[21];
+	char FCS[2];
+	char endflag;
+	char buffer[3];
+};
+
+/*
+struct A_BSO_B_MESSAGE 
+{
+	struct CHAR256 slop:8;
+	struct CHAR256 train:24;
+	struct CHAR256 startflag:8;
+	struct CHAR256 MSGID:6;
+	struct CHAR256 UserID:30;
+	struct CHAR256 data:113;
+	struct CHAR256 communistatus:19;
+	struct CHAR256 FCS:16;
+	struct CHAR256 endflag:8;
+	struct CHAR256 buffer:24;
+};*/
+
+
+
 struct Slot_TDMA_Cand
 {
 	unsigned short slot_index:15;
@@ -42,10 +93,12 @@ struct Slot_TDMA_Cand
 int Ra_TDMA(struct AIS_TDMA *LME);
 
 void Ra_TDMA_main();
-unsigned char Get_Slot_RATDMA(unsigned int start_slot,unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
-
 void wait_for_slot(unsigned int slot_index);
 void send_message(unsigned int slot_index,unsigned short channel);
+
+unsigned char Get_Slot_ITDMA(unsigned int slot_start,unsigned int slot_NI,unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
+unsigned char Get_Slot_RATDMA(unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
+void I_TDMA(unsigned int slot_start,unsigned int slot_NI,struct AIS_ITDMA *LME,unsigned int slot_send);
 
 
 #endif
