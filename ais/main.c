@@ -5,12 +5,18 @@
 
 struct SLOT_S g_slot[MAX_SLOT_COUNT];
 unsigned short int g_slot_index;
+void *g_message = NULL;
+unsigned char g_cur_Rr=0;
+
 
 
 int main(int argc, char *argv[])
 {	
-	char framestatus[SLOT_TOTLE];
+	char framestatus[SLOT_TOTLE];	
+	struct A_BSO_B_MESSAGE TDMA_Message;
 	int si_start,Rr,length;
+
+	g_message = (void *)&TDMA_Message;
 	status_init();
 
 	g_slot_index=50;//随机初始化当前时隙值

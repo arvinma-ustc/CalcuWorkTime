@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <time.h> 
 
+#define TMO_MIN 	3
+#define TMO_MAX 	7
+
+
 struct SLOT_S
 {
 	unsigned char chb_a:4;   //信道a 状态   用于时隙5条规则
@@ -94,11 +98,22 @@ int Ra_TDMA(struct AIS_TDMA *LME);
 
 void Ra_TDMA_main();
 void wait_for_slot(unsigned int slot_index);
-void send_message(unsigned int slot_index,unsigned short channel);
+void send_message(unsigned int slot_index,unsigned short channel,void *data);
 
 unsigned char Get_Slot_ITDMA(unsigned int slot_start,unsigned int slot_NI,unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
 unsigned char Get_Slot_RATDMA(unsigned int slot_num,struct Slot_TDMA_Cand *slot_cand);
 void I_TDMA(unsigned int slot_start,unsigned int slot_NI,struct AIS_ITDMA *LME,unsigned int slot_send);
+unsigned char Get_New_NTS_SOTDMA(unsigned int slot_start,unsigned int slot_NI);
+void add_TmoOF_to_Message(unsigned short TMO,unsigned short Offset,void *message);
+unsigned short Get_NTS(unsigned short SI_begin,unsigned short SI_end);
+int SOTDMA(unsigned short NSS,unsigned char Rr);
+char Check_NSS_NTS(unsigned short NSS,unsigned short NTS,unsigned short NI);
+void Wait_Next_SI(unsigned short NS, unsigned short NI,unsigned short send_slot);
+void SOTDMA_Update(unsigned short NSS,unsigned char Rr);
+
+void SOTDMA_Contin(unsigned short NSS,unsigned char Rr);
+
+
 
 
 #endif
