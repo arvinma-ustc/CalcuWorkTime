@@ -153,7 +153,7 @@ void I_TDMA(unsigned int slot_start,unsigned int slot_NI,struct AIS_ITDMA *LME,u
 		LME->CHANNEL_NEXT = slot_cand[slot_next].chanel;
 		slot_next = slot_cand[slot_next].slot_index;//choice next send slot
 	}
-	LME->ITING = slot_next - slot_send;
+	LME->ITING = MAX_SLOT_COUNT + slot_next - slot_send; //plus MAX_SLOT_COUNT mean next frame
 
 	Set_ITDMA_Flag(LME,g_message);	
 }
@@ -211,6 +211,7 @@ int SOTDMA(unsigned short NSS,unsigned char Rr)
 	if(Rr > 30 || Rr < 2)
 		return -2;
 
+//compare argument with global variable check if change report rate 
 	if(Rr == g_cur_Rr)
 	//continue stage
 	SOTDMA_Contin(NSS,Rr);
@@ -237,47 +238,50 @@ unsigned char	Rr_index;	//report rate index
 
 
 	NI = 2250/Rr;
-while(Rr == g_cur_Rr)
-{
-	//calculate current Rr_index
-	if(g_slot_index < NSS)
-		Rr_index=(g_slot_index + MAX_SLOT_COUNT - NSS)/NI;
-	else
-		Rr_index=(g_slot_index - NSS)/NI;
-
-	//calculate next SI
-	Rr_index =	(Rr_index + 1)%Rr;
-	NS = NSS + (Rr_index * NI);
-	SI_begin = (NS - (NI/10))%MAX_SLOT_COUNT;
-	SI_end = (NS + (NI/10))%MAX_SLOT_COUNT;
-
-	//check stage
-
-	NTS = Get_NTS(SI_begin,SI_end);
-	//waiting for NTS
-	wait_for_slot(NTS);
-	//decrease time out
-	TMO = --g_slot[NTS].outTime;
-	//check time out equal to zero 
-	if(TMO == 0)
+	while(Rr == g_cur_Rr)
 	{
-		//get new NTS
-		NTS_New=Get_New_NTS_SOTDMA(NTS,NI); //error deal need
-		//calculate new offset
-		offset = (NTS_New - NTS)%MAX_SLOT_COUNT;
-		TMO = TMO_MIN + rand()%(TMO_MAX + 1 - TMO_MIN);
-		g_slot[NTS_New].outTime = TMO;
+		//calculate current Rr_index
+		if(g_slot_index < NSS)
+			Rr_index=(g_slot_index + MAX_SLOT_COUNT - NSS)/NI;
+		else
+			Rr_index=(g_slot_index - NSS)/NI;
+
+		//calculate next SI
+		Rr_index =	(Rr_index + 1)%Rr;
+		NS = NSS + (Rr_index * NI);
+		SI_begin = (NS - (NI/10))%MAX_SLOT_COUNT;
+		SI_end = (NS + (NI/10))%MAX_SLOT_COUNT;
+
+		//check stage
+
+		NTS = Get_NTS(SI_begin,SI_end);
+		//waiting for NTS
+		wait_for_slot(NTS);
+		//decrease time out
+		TMO = --g_slot[NTS].outTime;
+		//check time out equal to zero 
+		if(TMO == 0)
+			{
+			//get new NTS
+			NTS_New=Get_New_NTS_SOTDMA(NTS,NI);
+			//error deal 
+			if(NTS_New == MAX_SLOT_COUNT)
+				break;
+			//calculate new offset and new time out
+			offset = (NTS_New - NTS)%MAX_SLOT_COUNT;
+			TMO = TMO_MIN + rand()%(TMO_MAX + 1 - TMO_MIN);
+			g_slot[NTS_New].outTime = TMO;
+			}	
+		else
+			{
+			//set offset to zero
+			offset = 0;
+			}
+		//add new time out and offset to message
+		add_TmoOF_to_Message(TMO,offset,g_message);
+		//send message
+		send_message(NTS,g_slot[NTS].chb_S,g_message);
 	}	
-	else
-	{
-		//set offset to zero
-		offset = 0;
-	}
-	//add new time out and offset to message
-	add_TmoOF_to_Message(TMO,offset,g_message);
-	//send message
-	send_message(NTS,g_slot[NTS].chb_S,g_message);
-}	
 
 }
 
@@ -296,7 +300,7 @@ unsigned short	offset; 	//offset
 unsigned char	TMO;		//time out 3-7
 unsigned char	Rr_index;	//report rate index
 
-if(g_cur_Rr==0)
+if(g_cur_Rr==0) //g_cur_Rr initialize 0 when definition and will change in the first frame
 	return;
 
 	NI = 2250/g_cur_Rr;
@@ -353,6 +357,7 @@ while(1)
 
 }
 
+//waiting for next Select interval, check every slot in current SI if it status is STATUS_INTER
 void Wait_Next_SI(unsigned short NS, unsigned short NI,unsigned short send_slot)
 {
 	unsigned short increat=0;
@@ -446,14 +451,14 @@ unsigned char Get_New_NTS_SOTDMA(unsigned int slot_start,unsigned int slot_NI)
 
 
 	interval.start=slot_start;
-	interval.end=interval.start+slot_NI/5;
-	interval.nominal_slot=interval.start+slot_NI/10;
+	interval.end=interval.start+slot_NI/5;	//division 5 mean 20% 
+	interval.nominal_slot=interval.start+slot_NI/10;	//division 10 mean 10%
 	interval.report_index=1;
 	interval.report_rate=2;//does not use just for parament check
 
 	candidate.cadidate_sum=0;
-	candidate.report_index = 1;
-	candidate.report_rate = 2;
+	candidate.report_index = 1;	//small than report rate is ok
+	candidate.report_rate = 2;	//just use for argument check
 	candidate.slot_length=g_slot[slot_start].back;
 	
 	if(g_slot[slot_start].chb_S)

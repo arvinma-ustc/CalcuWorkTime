@@ -6,7 +6,7 @@
 struct SLOT_S g_slot[MAX_SLOT_COUNT];
 unsigned short int g_slot_index;
 void *g_message = NULL;
-unsigned char g_cur_Rr=0;
+unsigned char g_cur_Rr=0;		//golbal variable remember current report rate
 
 
 

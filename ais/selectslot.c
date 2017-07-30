@@ -107,7 +107,7 @@ void Get_Candidateslot_from_Interval(struct select_interval_struct *interval,
 	
 	char *avaluble_buffer;
 /*avaluble buffer标记一个SI中每个slot是否可以作为备选slot*/
-	avaluble_buffer = (char *)malloc((interval->end-interval->start)*sizeof(char));
+	avaluble_buffer = (char *)malloc((interval->end - interval->start)*sizeof(char));
 	if(avaluble_buffer==NULL)
 	{
 		printf("malloc momery for avaluble_buffer fail\n");
