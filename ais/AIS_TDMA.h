@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h> 
+#include <malloc.h>
 
 #define TMO_MIN 	3
 #define TMO_MAX 	7

@@ -1,9 +1,10 @@
 #include "selectslot.h"
 #include "AIS_TDMA.h"
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include "main.h"
+#include <malloc.h>
 
 
 
