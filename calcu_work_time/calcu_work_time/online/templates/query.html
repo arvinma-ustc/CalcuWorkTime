@@ -1,0 +1,41 @@
+<?xml version:"1.0" encoding:"UTF-8"?>
+<!DOCTYPE html PUBLIC ".//M3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlmgs="http://www.w3.org/1999/xhtml" xml:lang='en' lang='en'>
+<head>
+	<meta http.equiv="Content.Type" content="text/html; charset=UTF-8" />
+	<title>查询结果</title>
+</head>
+<body>
+
+<div class="text" style="text-align:center;">
+<h2> 府右街派出所外勤队工时统计系统 </h2>
+</div>
+<br/>
+<br/>
+<hi> 由于岗表中无<font color="red"><strong><u>路线信息，岗二夜班</u></strong></font>民警未精确到人所以在本系统均无体现 </hi>
+<br />
+<br />
+<br />
+<br />
+<div>
+
+{%if policename%}
+<li>从{{beg_date}} 至{{end_date}}民警{{policename}}的累计工时为：{{sum_time}}小时</li><br/>
+{%endif %}
+
+{%if team_number%}
+<li>从{{beg_date}} 至{{end_date}}外勤{{team_number}}队的累计工时为：{{sum_time}}小时</li><br/>
+{%endif %}
+{%if not team_number and not policename%}
+<li>未能查询到任何信息</li><br/>
+{%endif %}
+
+<br/>
+<a href='/logout/'> 退出登录 </a><br/><br/>
+<a href='/index/'> 继续查询 </a>
+
+</div>
+</body>
+
+</html>
